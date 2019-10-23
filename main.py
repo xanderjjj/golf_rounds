@@ -1,9 +1,12 @@
 
 import random
+import json
 
 ### Set variables here... ###
-people = 10
+# max 26 people
+people = 13
 rounds = 5
+loops = 1000000
 #############################
 
 group_max = 4
@@ -120,13 +123,15 @@ def shuffle(round):
             round[group_index][group_slot] = translation[round[group_index][group_slot]]
     return round
 
+def num_to_char(number):
+  return chr(number + 64)
 
 best_min_repeat_count = rounds * people
 best_roster = []
 best_repeat_list = dict()
 best_max_repeats = rounds
 best_min_repeats = rounds
-for game in range(0, 500000):
+for game in range(0, loops):
 
     group_sizes = list(sizes(people, group_min, group_max))
     roster = []
@@ -146,12 +151,31 @@ for game in range(0, 500000):
         best_max_repeats = max_repeats
         best_min_repeats = min_repeats
 
-
 # print("roster: {}".format(roster))
 for round in best_roster:
-    print("round: {}".format(round))
-print("repeats: {}".format(best_repeat_list))
+  new_list = []
+  for group in round:
+    new_group = []
+    for player in group:
+      new_group.append(num_to_char(player))
+    new_list.append(new_group)
+  print("round: {}".format(str(new_list)[1:-1]).replace("\'", ""))
+  #print("round: {}".format(round))
+#print("repeats: {}".format(best_repeat_list))
+max_repeat_count = 0
+for player in best_repeat_list:
+  new_dict = dict()
+  new_list = []
+  for entry in best_repeat_list[player]:
+    if best_repeat_list[player][entry] == best_max_repeats:
+      max_repeat_count = max_repeat_count + 1
+    new_dict[num_to_char(entry)] = best_repeat_list[player][entry]
+    new_dict[num_to_char(player)] = "_"
+  for key in new_dict:
+    new_list.append("{}: {}".format(key, new_dict[key]))
+  new_list.sort()
+  print("'{}' {}".format(num_to_char(player), new_list).replace("\'", ""))
 print("max repeats: {}".format(best_max_repeats))
+print("max repeat count: {}".format(max_repeat_count))
 print("min repeats: {}".format(best_min_repeats))
 print("min repeat count: {}".format(best_min_repeat_count))
-
